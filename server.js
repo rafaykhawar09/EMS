@@ -85,6 +85,41 @@ async function isRolesEmpty(){
      return result;
 }
 
+async function addDepartment(departmentName){
+
+     try{
+          await query('INSERT INTO departments(name) VALUES (?);', [departmentName]);
+     }
+     catch(err){
+          return console.log(err);
+     }
+}
+
+async function addRole(title, salary, dID){
+     
+     try{
+          await query('INSERT INTO roles(title, salary, departmentID) VALUES (?, ?, ?);', [title, salary, dID]);
+     }
+     catch(err){
+          return console.log(err);
+     }
+}
+
+async function addEmployee(fName, lName, rID, mID=""){
+
+     try{
+          if(mID === ""){
+               await query('INSERT INTO employees(firstName, lastName, roleID) VALUES (?, ?, ?);', [fName, lName, rID]);
+          }
+          else{
+               await query('INSERT INTO employees(firstName, lastName, roleID, managerID) VALUES (?, ?, ?, ?);', [fName, lName, rID, mID]);
+          }
+     }
+     catch(err){
+          return console.log(err);
+     }
+}
+
 
 
 exports.viewDepartments = viewDepartments;
@@ -96,11 +131,15 @@ exports.isRolesEmpty = isRolesEmpty;
 async function main(){
      
      try{
-          await viewDepartments();
-          await viewRoles();
-          await viewEmployees();
-          console.log((await isDepartmentsEmpty()));
-          console.log((await isRolesEmpty()));
+          // await viewDepartments();
+          // await viewRoles();
+          // await viewEmployees();
+          // console.log((await isDepartmentsEmpty()));
+          // console.log((await isRolesEmpty()));
+          // await addEmployee("John", "Doe", 3, 1);
+          // await addEmployee("Max", "Payne", 2);
+          // await viewEmployees();
+          
      }
      finally{
          connection.end();
