@@ -41,7 +41,7 @@ async function viewRoles(){
 async function viewEmployees(){
      
      try{
-          const response = await query('SELECT * FROM Employees');
+          const response = await query('SELECT * FROM employees');
           
           console.log("\nEmployees:");
           console.table(response);
@@ -51,14 +51,60 @@ async function viewEmployees(){
      }
 }
 
+async function isDepartmentsEmpty(){
+
+     let result;
+     try{
+          let count = await query('SELECT COUNT(*) FROM departments');
+
+          if(count === 0)
+               result = true;
+          else
+               result = false;
+     }
+     catch(err){
+          return console.log(err);
+     }
+     return result;
+}
+
+async function isRolesEmpty(){
+
+     let result;
+     try{
+          let count = await query('SELECT COUNT(*) FROM roles');
+
+          if(count === 0)
+               result = true;
+          else
+               result = false;
+     }
+     catch(err){
+          return console.log(err);
+     }
+     return result;
+}
+
+
 
 exports.viewDepartments = viewDepartments;
+exports.viewRoles = viewRoles;
+exports.viewEmployees = viewEmployees;
+exports.isDepartmentsEmpty = isDepartmentsEmpty;
+exports.isRolesEmpty = isRolesEmpty;
 
 async function main(){
      
-     await viewDepartments();
-     await viewRoles();
-     await viewEmployees();
+     try{
+          await viewDepartments();
+          await viewRoles();
+          await viewEmployees();
+          console.log((await isDepartmentsEmpty()));
+          console.log((await isRolesEmpty()));
+     }
+     finally{
+         connection.end();
+     }
 }
 
 main();
