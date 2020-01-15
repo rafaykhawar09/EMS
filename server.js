@@ -10,6 +10,7 @@ const connection = mysql.createConnection({
 });
 const query = util.promisify(connection.query).bind(connection);
 
+
 // The for loop in the following function was being used by in 3 different functions,
 // hence a function was made for it so it could be reused
 function printer(response){
@@ -19,9 +20,49 @@ function printer(response){
      }
 }
 
+
+
+async function getAllDepartmentNames(){
+
+     let response;
+     try{
+          response = await query('SELECT name FROM departments');
+     }
+     catch(err){
+          return console.log(err);
+     }
+     return response;
+}
+
+async function getDepartmentID(deptName){
+
+     let response;
+     try{
+          response = await query('SELECT d_id FROM departments WHERE name = ?', [deptName]);
+     }
+     catch(err){
+          return console.log(err);
+     }
+     return response;
+}
+
+async function getAllRolesTitles(){
+
+     let response;
+     try{
+          response = await query('SELECT title FROM roles');
+     }
+     catch(err){
+          return console.log(err);
+     }
+     return response;
+}
+
+
+
 // Prints the "Departments" table
 async function viewDepartments(){
-
+ 
      try{
           const response = await query('SELECT * FROM departments');
           
@@ -104,6 +145,7 @@ async function viewByEmployeesByManager(managerName){
 }
 
 
+
 // Checks if the "Departments" tale is empty or not
 async function isDepartmentsEmpty(){
 
@@ -139,6 +181,7 @@ async function isRolesEmpty(){
      }
      return result;
 }
+
 
 
 // Insert a row into "Departments" table
@@ -179,13 +222,34 @@ async function addEmployee(fName, lName, rID, mID=""){
      }
 }
 
-// Update employee role function
-async function updateEmployeRole(){
-     
-}
-// Update employee manager function BONUS, does it mean update an employee's manager or an employee who IS a manager
-// Delete row(s) from department, roles, employees, BONUS, problem with this
 
+
+// Update employee role function
+// managerID = e_id
+async function updateEmployeeManager(managerID, empID){
+
+     try{
+          await query('UPDATE employees SET managerID = ? WHERE e_id = ?;', [managerID, empID]);
+     }
+     catch(err){
+          return console.log(err);
+     }
+}
+
+// Update employee manager function
+async function updateEmployeeRole(roleID, empID){
+
+     try{
+          await query('UPDATE employees SET roleID = ? WHERE e_id = ?;', [roleID, empID]);
+     }
+     catch(err){
+          return console.log(err);
+     }
+}
+
+
+
+// Calculating the budget of a specified "Department"
 async function totalBudgetOfDept(departmentName){
      
      try{
@@ -198,31 +262,28 @@ async function totalBudgetOfDept(departmentName){
      }
 }
 
-exports.viewDepartments = viewDepartments;
-exports.viewRoles = viewRoles;
-exports.viewAllEmployeesData = viewAllEmployeesData;
-exports.isDepartmentsEmpty = isDepartmentsEmpty;
-exports.isRolesEmpty = isRolesEmpty;
+// Delete row(s) from department, roles, employees, BONUS, problem with this
 
-async function main(){
-     
-     try{
-          // await viewDepartments();
-          // await viewRoles();
-          // await viewAllEmployeesData();
-          // console.log((await isDepartmentsEmpty()));
-          // console.log((await isRolesEmpty()));
-          // await addEmployee("John", "Doe", 3, 1);
-          // await addEmployee("Max", "Payne", 2);
-          // await viewEmployees();
-          // await viewEmployeesByDepartment("Finances");
-          // await viewByEmployeesByManager("Sarah");
-          // await viewByEmployeesByRole("Accountant");
-          // await totalBudgetOfDept("Finances")
-     }
-     finally{
-         connection.end();
-     }
+
+module.exports = {
+     connection,
+     query,
+     printer,
+     getAllDepartmentNames,
+     getDepartmentID,
+     getAllRolesTitles,
+     viewDepartments,
+     viewRoles,
+     viewAllEmployeesData,
+     viewEmployeesByDepartment,
+     viewByEmployeesByRole,
+     viewByEmployeesByManager,
+     isDepartmentsEmpty,
+     isRolesEmpty,
+     addDepartment,
+     addRole,
+     addEmployee,
+     updateEmployeeRole,
+     updateEmployeeManager,
+     totalBudgetOfDept
 }
-
-main();
